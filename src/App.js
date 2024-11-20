@@ -4,23 +4,13 @@ import "./App.css";
 
 const App = () => {
     const [interfaces, setInterfaces] = useState([]);
+    const [dhcpClients, setDhcpClients] = useState([]);
     const [error, setError] = useState("");
     const [lastUpdated, setLastUpdated] = useState("");
 
-    // useEffect(() => {
-    //     // Ambil data dari API
-    //     axios
-    //         .get("http://localhost:5000/api/interfaces") // Ganti dengan URL API Anda
-    //         .then((response) => {
-    //             setInterfaces(response.data);
-    //         })
-    //         .catch((err) => {
-    //             setError("Gagal mengambil data dari API.");
-    //         });
-    // }, []);
-    const fetchData = async () => {
+    const fetchInterfaces = async () => {
       try {
-          const response = await axios.get("http://localhost:5000/api/interfaces"); // Ganti URL sesuai backend Anda
+          const response = await axios.get("http://localhost:5000/api/interfaces"); 
           setInterfaces(response.data);
           setError(""); // Reset error jika sebelumnya ada
           setLastUpdated(new Date().toLocaleDateString());
@@ -30,18 +20,33 @@ const App = () => {
       }
   };
 
+    // Ambil data DHCP Clients
+    const fetchDhcpClients = async () => {
+      try {
+          const response = await axios.get("http://localhost:5000/api/dhcp-clients");
+          setDhcpClients(response.data);
+      } catch (err) {
+          console.error(err);
+          setError("Failed to fetch DHCP clients.");
+      }
+  };
+
   // Jalankan fetchData secara periodik
   useEffect(() => {
-      fetchData(); // Ambil data pertama kali
+      const fetchData = () => {
+        fetchInterfaces();
+        fetchDhcpClients();
+      } // Ambil data pertama kali
 
-      const intervalId = setInterval(fetchData, 1000); // Ambil data setiap 5 detik
+      fetchData();
+      const intervalId = setInterval(fetchData, 5000); // Ambil data setiap 5 detik
 
       return () => clearInterval(intervalId); // Bersihkan interval saat komponen unmount
   }, []);
 
     return (
         <div className="container">
-            <h1 className="title">Mikrotik Interfaces</h1>
+            <h2>Mikrotik Interfaces</h2>
             {error && <p className="error">{error}</p>}
             {interfaces.length > 0 ? (
                <div className="table-container">
@@ -76,6 +81,43 @@ const App = () => {
               </div>  
             ) : (
                 <p className="no-data">Tidak ada data untuk ditampilkan.</p>
+            )}
+
+            {/* Tabel DHCP Clients */}
+            <h2>DHCP Clients</h2>
+            {dhcpClients.length > 0 ? (
+                <div className="table-container">
+                    <table className="simple-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Address</th>
+                                <th>Interface</th>
+                                <th>Gateway</th>
+                                <th>Status</th>
+                                <th>Primary DNS</th>
+                                <th>Expires After</th>
+                                <th>DHCP Server</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {dhcpClients.map((client, index) => (
+                                <tr key={index}>
+                                    <td>{client[".id"]}</td>
+                                    <td>{client.address}</td>
+                                    <td>{client.interface}</td>
+                                    <td>{client.gateway}</td>
+                                    <td>{client.status}</td>
+                                    <td>{client["primary-dns"] || "N/A"}</td>
+                                    <td>{client["expires-after"] || "N/A"}</td>
+                                    <td>{client["dhcp-server"] || "N/A"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <p className="no-data">No DHCP clients to display.</p>
             )}
         </div>
     );
