@@ -36,3 +36,71 @@
     transform: rotate(360deg);
   }
 }
+/* Kontainer utama */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+/* Judul dan Subjudul */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Tabel sederhana */
+.table-container {
+  overflow-x: auto; /* Responsif untuk layar kecil */
+}
+
+.simple-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.simple-table th,
+.simple-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.simple-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  color: #333;
+}
+
+.simple-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Pesan error */
+.error {
+  color: red;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Pesan tidak ada data */
+.no-data {
+  color: #555;
+  text-align: center;
+  font-style: italic;
+}

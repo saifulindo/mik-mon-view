@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./App.css";
 
 const App = () => {
     const [interfaces, setInterfaces] = useState([]);
     const [error, setError] = useState("");
+    const [lastUpdated, setLastUpdated] = useState("");
 
     // useEffect(() => {
     //     // Ambil data dari API
@@ -21,6 +23,7 @@ const App = () => {
           const response = await axios.get("http://localhost:5000/api/interfaces"); // Ganti URL sesuai backend Anda
           setInterfaces(response.data);
           setError(""); // Reset error jika sebelumnya ada
+          setLastUpdated(new Date().toLocaleDateString());
       } catch (err) {
           console.error(err);
           setError("Gagal mengambil data dari API.");
@@ -37,40 +40,42 @@ const App = () => {
   }, []);
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Mikrotik Interfaces</h1>
-            {error && <p className="text-red-500">{error}</p>}
+        <div className="container">
+            <h1 className="title">Mikrotik Interfaces</h1>
+            {error && <p className="error">{error}</p>}
             {interfaces.length > 0 ? (
-                <table className="table-auto border-collapse border border-gray-300 w-full text-sm">
+               <div className="table-container">
+                <table className="simple-table">
                     <thead>
                         <tr>
-                            <th className="border border-gray-300 px-4 py-2">ID</th>
-                            <th className="border border-gray-300 px-4 py-2">Name</th>
-                            <th className="border border-gray-300 px-4 py-2">MAC Address</th>
-                            <th className="border border-gray-300 px-4 py-2">MTU</th>
-                            <th className="border border-gray-300 px-4 py-2">Running</th>
-                            <th className="border border-gray-300 px-4 py-2">RX Bytes</th>
-                            <th className="border border-gray-300 px-4 py-2">TX Bytes</th>
-                            <th className="border border-gray-300 px-4 py-2">Last Link Up Time</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>MAC Address</th>
+                            <th>MTU</th>
+                            <th>Running</th>
+                            <th>RX Bytes</th>
+                            <th>TX Bytes</th>
+                            <th>Last Link Up Time</th>
                         </tr>
                     </thead>
                     <tbody>
                         {interfaces.map((iface, index) => (
                             <tr key={index}>
-                                <td className="border border-gray-300 px-4 py-2">{iface[".id"]}</td>
-                                <td className="border border-gray-300 px-4 py-2">{iface.name}</td>
-                                <td className="border border-gray-300 px-4 py-2">{iface["mac-address"]}</td>
-                                <td className="border border-gray-300 px-4 py-2">{iface.mtu}</td>
-                                <td className="border border-gray-300 px-4 py-2">{iface.running ? "Yes" : "No"}</td>
-                                <td className="border border-gray-300 px-4 py-2">{iface["rx-byte"]}</td>
-                                <td className="border border-gray-300 px-4 py-2">{iface["tx-byte"]}</td>
-                                <td className="border border-gray-300 px-4 py-2">{iface["last-link-up-time"]}</td>
+                                <td>{iface[".id"]}</td>
+                                <td>{iface.name}</td>
+                                <td>{iface["mac-address"]}</td>
+                                <td>{iface.mtu}</td>
+                                <td>{iface.running ? "Yes" : "No"}</td>
+                                <td>{iface["rx-byte"]}</td>
+                                <td>{iface["tx-byte"]}</td>
+                                <td>{iface["last-link-up-time"]}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+              </div>  
             ) : (
-                <p className="text-gray-500">Tidak ada data untuk ditampilkan.</p>
+                <p className="no-data">Tidak ada data untuk ditampilkan.</p>
             )}
         </div>
     );
