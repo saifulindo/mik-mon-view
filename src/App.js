@@ -46,7 +46,8 @@ const App = () => {
 
     return (
         <div className="container">
-            <h2>Mikrotik Interfaces</h2>
+            <h1 className="title">Mikrotik Monitoring</h1>
+            <h2>Interfaces</h2>
             {error && <p className="error">{error}</p>}
             {interfaces.length > 0 ? (
                <div className="table-container">
