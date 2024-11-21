@@ -142,9 +142,11 @@ const App = () => {
                         <th>ID</th>
                         <th>Destination Address</th>
                         <th>Gateway</th>
-                        <th>Interface</th>
+                        {/* <th>Interface</th> */}
                         <th>Distance</th>
                         <th>Active</th>
+                        <th>Scope</th>
+                        <th>Target Scope</th>
                     </tr>
                   </thead>
                 <tbody>
@@ -153,9 +155,11 @@ const App = () => {
                         <td>{route[".id"]}</td>
                         <td>{route["dst-address"]}</td>
                         <td>{route.gateway}</td>
-                        <td>{route.interface}</td>
+                        {/* <td>{route.interface}</td> */}
                         <td>{route.distance}</td>
                         <td>{route.active ? "Yes" : "No"}</td>
+                        <td>{route.scope}</td>
+                        <td>{route["target-scope"]}</td>
                     </tr>
                 ))}
                </tbody>
