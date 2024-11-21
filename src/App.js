@@ -7,6 +7,7 @@ const App = () => {
     const [dhcpClients, setDhcpClients] = useState([]);
     const [error, setError] = useState("");
     const [lastUpdated, setLastUpdated] = useState("");
+    const [routes, setRoutes] = useState([]);
 
     const fetchInterfaces = async () => {
       try {
@@ -31,11 +32,23 @@ const App = () => {
       }
   };
 
+  const fetchRoutes = async () => {
+    try {
+        const response = await axios.get("http://localhost:5000/api/routes");
+        setRoutes(response.data);
+        setError(""); // Reset error jika ada
+    } catch (err) {
+        console.error(err);
+        setError("Gagal mengambil data Routes.");
+    }
+};
+
   // Jalankan fetchData secara periodik
   useEffect(() => {
       const fetchData = () => {
         fetchInterfaces();
         fetchDhcpClients();
+        fetchRoutes();
       } // Ambil data pertama kali
 
       fetchData();
@@ -120,6 +133,37 @@ const App = () => {
             ) : (
                 <p className="no-data">No DHCP clients to display.</p>
             )}
+            <h2>Routes</h2>
+            {routes.length > 0 ? (
+            <div className="table-container">
+                <table className="simple-table">
+                  <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Destination Address</th>
+                        <th>Gateway</th>
+                        <th>Interface</th>
+                        <th>Distance</th>
+                        <th>Active</th>
+                    </tr>
+                  </thead>
+                <tbody>
+                {routes.map((route, index) => (
+                    <tr key={index}>
+                        <td>{route[".id"]}</td>
+                        <td>{route["dst-address"]}</td>
+                        <td>{route.gateway}</td>
+                        <td>{route.interface}</td>
+                        <td>{route.distance}</td>
+                        <td>{route.active ? "Yes" : "No"}</td>
+                    </tr>
+                ))}
+               </tbody>
+            </table>
+        </div>
+        ) : (
+               <p className="no-data">Tidak ada data route untuk ditampilkan.</p>
+        )}
         </div>
     );
 };
