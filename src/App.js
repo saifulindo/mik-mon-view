@@ -19,6 +19,9 @@ const App = () => {
         dynamic: false,
         network: "",
     });
+    const [errorMessage, setErrorMessage] = useState("");
+    const [message, setMessage] = useState("");
+    const [isAdding, setIsAdding] = useState(false);
 
     // Ambil data Interfaces
     const fetchInterfaces = async () => {
@@ -122,6 +125,32 @@ const App = () => {
             alert("Terjadi kesalahan saat menghapus IP address.");
         }
     };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post("http://localhost:5000/api/address", formData);
+
+            if (response.status === 201) {
+                setMessage("IP Address added successfully");
+
+                // Reset form data
+                setFormData({
+                    address: "",
+                    interface: "",
+                    disabled: false,
+                    dynamic: false,
+                    network: "",
+                });
+
+                // Sembunyikan form setelah data berhasil disubmit
+                setIsAdding(false); // Form akan disembunyikan setelah submit
+            }
+        } catch (err) {
+            setErrorMessage("Failed to add IP Address.");
+            console.error(err);
+        }
+    };
     
 
     // Fungsi untuk memulai mode edit IP Address
@@ -171,72 +200,29 @@ const App = () => {
 
         return () => clearInterval(intervalId); // Bersihkan interval saat komponen unmount
     }, []);
+      
+    const handleAddIp = () => {
+        setIsAdding(true); // Menampilkan form input IP
+      };
+    
+      const handleCancelAdd = () => {
+        setIsAdding(false); // Menyembunyikan form input IP
+        setFormData({
+          address: '',
+          interface: '',
+          disabled: false,
+          dynamic: false,
+          network: '',
+        });
+      };
 
-    // function IpAddressTable() {
-    //     const [ipAddresses, setIpAddresses] = useState([]); // Data IP addresses
-    //     const [formData, setFormData] = useState({
-    //       address: '',
-    //       interface: '',
-    //       disabled: false,
-    //       dynamic: false,
-    //       network: '',
-    //     });
-    //     const [isAdding, setIsAdding] = useState(false); // Menandakan apakah sedang menambah data
-    //     const [error, setError] = useState(null);
-      
-    //     const handleChange = (e) => {
-    //       const { name, value, type, checked } = e.target;
-    //       setFormData({
-    //         ...formData,
-    //         [name]: type === 'checkbox' ? checked : value,
-    //       });
-    //     };
-      
-    // const handleAddIp = () => {
-    //     setIsAdding(true); // Menampilkan form input IP
-    //   };
-    
-    //   const handleCancelAdd = () => {
-    //     setIsAdding(false); // Menyembunyikan form input IP
-    //     setFormData({
-    //       address: '',
-    //       interface: '',
-    //       disabled: false,
-    //       dynamic: false,
-    //       network: '',
-    //     });
-    //   };
-    
-    //   const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //       // Kirim data ke server Flask untuk menambah IP
-    //       const response = await fetch('http://localhost:5000/api/address', {
-    //         method: 'POST',
-    //         headers: {
-    //           'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify(formData),
-    //       });
-    
-    //       const result = await response.json();
-    //       if (response.ok) {
-    //         setIpAddresses([...ipAddresses, result]);
-    //         setIsAdding(false); // Menyembunyikan form
-    //         setFormData({
-    //           address: '',
-    //           interface: '',
-    //           disabled: false,
-    //           dynamic: false,
-    //           network: '',
-    //         });
-    //       } else {
-    //         setError(result.error || 'Failed to add IP address');
-    //       }
-    //     } catch (error) {
-    //       setError('Something went wrong!');
-    //     }
-    //   };
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === "checkbox" ? checked : value,
+        });
+    };
 
     return (
         <div className="container">
@@ -381,72 +367,71 @@ const App = () => {
                 <p className="no-data">Tidak ada data IP Address untuk ditampilkan.</p>
             )}
             {/* Tabel IP Addresses */}
-            {/* <div className="header-container"> */}
+            <div className="header-container">
                 <h2>IP Addresses</h2>
-                {/* <button className="add-ip-button" onClick={handleAddIp}>Tambah</button>
-            </div> */}
+                <button className="add-ip-button" onClick={handleAddIp}>Tambah</button>
+            </div>
 
-            {/* Form Tambah IP
+            {/* Form to Add IP Address (Hidden when isAdding is false) */}
             {isAdding && (
                 <div className="form-container">
-                <h3>Tambah IP Address</h3>
-                <form onSubmit={handleSubmit}>
-                    <div>
-                    <label>Address:</label>
-                    <input
-                        type="text"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        required
-                    />
-                    </div>
-                    <div>
-                    <label>Interface:</label>
-                    <input
-                        type="text"
-                        name="interface"
-                        value={formData.interface}
-                        onChange={handleChange}
-                        required
-                    />
-                    </div>
-                    <div>
-                    <label>Disabled:</label>
-                    <input
-                        type="checkbox"
-                        name="disabled"
-                        checked={formData.disabled}
-                        onChange={handleChange}
-                    />
-                    </div>
-                    <div>
-                    <label>Dynamic:</label>
-                    <input
-                        type="checkbox"
-                        name="dynamic"
-                        checked={formData.dynamic}
-                        onChange={handleChange}
-                    />
-                    </div>
-                    <div>
-                    <label>Network:</label>
-                    <input
-                        type="text"
-                        name="network"
-                        value={formData.network}
-                        onChange={handleChange}
-                        required
-                    />
-                    </div>
-                    <div>
-                    <button type="submit">Tambah IP</button>
-                    <button type="button" onClick={handleCancelAdd}>Cancel</button>
-                    </div>
-                </form>
-                {error && <p className="error-message">{error}</p>}
+                    <h3>Tambah IP Address</h3>
+                    <form onSubmit={handleSubmit}>
+                        <div>
+                            <label>Address:</label>
+                            <input
+                                type="text"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label>Interface:</label>
+                            <input
+                                type="text"
+                                name="interface"
+                                value={formData.interface}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label>Disabled:</label>
+                            <input
+                                type="checkbox"
+                                name="disabled"
+                                checked={formData.disabled}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <label>Dynamic:</label>
+                            <input
+                                type="checkbox"
+                                name="dynamic"
+                                checked={formData.dynamic}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <label>Network:</label>
+                            <input
+                                type="text"
+                                name="network"
+                                value={formData.network}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <button type="submit">Tambah IP</button>
+                        </div>
+                    </form>
+                    {error && <p className="error-message">{error}</p>}
                 </div>
-            )} */}
+            )}
             
             {ipAddresses.length > 0 ? (
                 <div className="table-container">
